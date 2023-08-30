@@ -23,21 +23,22 @@ def generate_embedding(text):
     return response['data'][0]['embedding']
 
 
+def run(): 
+  message_history = client.messages.list()
+  output_csv_path = './message_history.csv'
 
-message_history = client.messages.list()
-output_csv_path = './message_history.csv'
+  with open(output_csv_path, 'w', newline='') as output_csv:
+    # Write header row
+    csv_writer = csv.writer(output_csv)
+    csv_writer.writerow(['sid','body','direction','embedding']);
 
-with open(output_csv_path, 'w', newline='') as output_csv:
-  # Write header row
-  csv_writer = csv.writer(output_csv)
-  csv_writer.writerow(['sid','body','direction','embedding']);
+    for record in message_history:
+        print(record.body)
+        embedding = generate_embedding(record.body);
 
-  for record in message_history:
-      print(record.body)
-      embedding = generate_embedding(record.body);
+        csv_writer.writerow([record.sid, record.body, record.direction] + [embedding]) 
 
-      csv_writer.writerow([record.sid, record.body, record.direction] + [embedding]) 
+    print('All messages downloaded and created with embeddings');
 
-  print('All messages downloaded and created with embeddings');
-
-cluster();
+  clustered_results = cluster();
+  return clustered_results

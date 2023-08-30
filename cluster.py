@@ -28,8 +28,10 @@ def cluster():
   labels = kmeans.labels_
   df["Cluster"] = labels
 
-  for i in range(n_clusters):
+  response = []
 
+  for i in range(n_clusters):
+      entry = {}
       messages = "\n".join(
           df[df.Cluster == i]
           .body
@@ -45,10 +47,14 @@ def cluster():
           frequency_penalty=0,
           presence_penalty=0,
       )
-      print(response["choices"][0]["text"].replace("\n", ""))
 
+      entry['summary'] = response["choices"][0]["text"].replace("\n", "")
+      entry['examples'] = []
       sample_cluster_rows = df[df.Cluster == i].sample(rev_per_cluster, random_state=42)
       for j in range(rev_per_cluster):
+          entry['examples'].push(sample_cluster_rows.body.str[:160].values[j])
           print(sample_cluster_rows.body.str[:160].values[j])
-
-      print("-" * 100)
+      
+      response.push(entry);
+     
+  return response

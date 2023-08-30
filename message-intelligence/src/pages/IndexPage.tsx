@@ -22,7 +22,7 @@ export const IndexPage = (): JSX.Element => {
     event.preventDefault();
     console.log(accountSid, authToken)
   
-    const response = await fetch('/cluster', {
+    const response = await fetch('http://localhost:5000/cluster', {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       mode: "no-cors", // no-cors, *cors, same-origin
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -35,6 +35,8 @@ export const IndexPage = (): JSX.Element => {
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: JSON.stringify({}), // body data type must match "Content-Type" header
     })
+
+    console.log(response)
   }
 
   return (
