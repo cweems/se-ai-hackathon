@@ -5,6 +5,7 @@ from twilio.rest import Client
 from datetime import datetime
 import openai
 import csv
+from cluster import cluster
 
 load_dotenv()
 
@@ -38,3 +39,5 @@ with open(output_csv_path, 'w', newline='') as output_csv:
       csv_writer.writerow([record.sid, record.body, record.direction] + [embedding]) 
 
   print('All messages downloaded and created with embeddings');
+
+cluster();

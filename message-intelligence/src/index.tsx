@@ -20,18 +20,8 @@ export const Index = (): JSX.Element => {
     <App>
       <React.Suspense fallback={<Loading />}>
         <BrowserRouter>
-          <Stack orientation="horizontal" spacing="space20">
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <Link to="/">Home</Link>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <Link to="/page1">page 1</Link>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <Link to="/page2">page 2</Link>
-          </Stack>
           <Routes>
             <Route path="" element={<IndexPage />} />
-            <Route path="/message-summaizer" element={<Page1 />} />
-            <Route path="/page2" element={<Page2 />} />
           </Routes>
         </BrowserRouter>
       </React.Suspense>
