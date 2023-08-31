@@ -8,13 +8,6 @@ import reportWebVitals from './reportWebVitals';
 import {IndexPage} from './pages/IndexPage';
 import {Loading} from './components/Loading';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const Page1 = React.lazy(async () => import('./pages/Page1'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const Page2 = React.lazy(async () => import('./pages/Page2'));
-
 export const Index = (): JSX.Element => {
   return (
     <App>

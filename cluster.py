@@ -28,7 +28,7 @@ def cluster():
   labels = kmeans.labels_
   df["Cluster"] = labels
 
-  response = []
+  result = []
 
   for i in range(n_clusters):
       entry = {}
@@ -49,12 +49,16 @@ def cluster():
       )
 
       entry['summary'] = response["choices"][0]["text"].replace("\n", "")
-      entry['examples'] = []
+      examples = []
       sample_cluster_rows = df[df.Cluster == i].sample(rev_per_cluster, random_state=42)
       for j in range(rev_per_cluster):
-          entry['examples'].push(sample_cluster_rows.body.str[:160].values[j])
+          examples.append(sample_cluster_rows.body.str[:160].values[j])
           print(sample_cluster_rows.body.str[:160].values[j])
       
-      response.push(entry);
+      entry['examples'] = examples;
+      result.append(entry);
+      entry['length'] = len(df[df.Cluster == i]);
      
-  return response
+  return result
+
+cluster()

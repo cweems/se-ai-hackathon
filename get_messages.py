@@ -32,11 +32,12 @@ def run():
     csv_writer = csv.writer(output_csv)
     csv_writer.writerow(['sid','body','direction','embedding']);
 
-    for record in message_history:
-        print(record.body)
-        embedding = generate_embedding(record.body);
+    for message in message_history:
+        if message.body != "":
+          print(message.body)
+          embedding = generate_embedding(message.body);
 
-        csv_writer.writerow([record.sid, record.body, record.direction] + [embedding]) 
+          csv_writer.writerow([message.sid, message.body, message.direction] + [embedding]) 
 
     print('All messages downloaded and created with embeddings');
 
