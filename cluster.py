@@ -40,7 +40,7 @@ def cluster():
       )
       response = openai.Completion.create(
           engine="text-davinci-003",
-          prompt=f'Briefly, what do these SMS messages have in common and what is the general theme?\n\nCustomer sms:\n"""\n{messages}\n"""\n\nTheme:',
+          prompt=f'Briefly, what do these SMS messages have in common? If there is no commonality, respond with "Mixed message types"\n\nCustomer sms:\n"""\n{messages}\n"""\n\nTheme:',
           temperature=0,
           max_tokens=64,
           top_p=1,
@@ -52,8 +52,11 @@ def cluster():
       examples = []
       sample_cluster_rows = df[df.Cluster == i].sample(rev_per_cluster, random_state=42)
       for j in range(rev_per_cluster):
-          examples.append(sample_cluster_rows.body.str[:160].values[j])
-          print(sample_cluster_rows.body.str[:160].values[j])
+          example = sample_cluster_rows.body.str[:160].values[j]
+
+          if not example in examples:
+            examples.append(sample_cluster_rows.body.str[:160].values[j])
+            print(sample_cluster_rows.body.str[:160].values[j])
       
       entry['examples'] = examples;
       result.append(entry);

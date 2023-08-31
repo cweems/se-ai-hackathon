@@ -25,15 +25,14 @@ export const IndexPage = (): JSX.Element => {
   
   async function callBackend (event: any, accountSid: string, authToken: string) {
     event.preventDefault();
-    console.log(accountSid, authToken)
   
-    const response = await fetch('http://localhost:8000/cluster', {
+    console.log(accountSid, authToken);
+    await fetch(`http://localhost:8000/cluster/${accountSid}/${authToken}`, {
       method: "GET", // *GET, POST, PUT, DELETE, etc.
       mode: "no-cors", // no-cors, *cors, same-origin
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       headers: {
         "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       redirect: "follow", // manual, *follow, error
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
@@ -70,11 +69,19 @@ export const IndexPage = (): JSX.Element => {
             <Label htmlFor="email_address" required>Account SID</Label>
             <Input onChange={(e) => { setAccountSid(e.target.value)}} aria-describedby="email_help_text" id="email_address" name="email_address" type="text" placeholder="ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" required/>
             <HelpText id="email_help_text">
-              Find your account SID in the <Anchor href="https://twilio.com/console">Twilio Console <LinkExternalIcon decorative={true} title="Description of icon" /></Anchor>
+              Find your account SID in the <Anchor href="https://twilio.com/console">Twilio Console</Anchor>.
             </HelpText>
             <Label htmlFor="email_address" required>Auth Token</Label>
-            <Input onChange={(e) => { setAuthToken(e.target.value)}} aria-describedby="email_help_text" id="email_address" name="email_address" type="password" placeholder="secrets.... here...." required/>
+            <Input onChange={(e) => { setAuthToken(e.target.value)}} aria-describedby="email_help_text" id="email_address" name="email_address" type="password" placeholder="••••••••••••••••••••••••••••••" required/>
             <HelpText id="email_help_text">Enter your auth token here.</HelpText>
+          </Box>
+          <Box
+            backgroundColor="colorBackgroundWarningWeakest"
+            display="inline-block"
+            padding="space40"
+            marginBottom="space60"
+          >
+            Warning: All message data in your account will be shared with OpenAI and may be stored for an indeterminate amount of time. Use only with a personal demo account.
           </Box>
           <Button variant="primary" onClick={(event) => callBackend(event, accountSid, authToken)}>
             <NewIcon decorative />
@@ -86,12 +93,7 @@ export const IndexPage = (): JSX.Element => {
       <Column>
         <Box
           margin="space100"
-          padding="space60"
           minHeight={'50vh'}
-          borderRadius="borderRadius20"
-          borderStyle="solid"
-          borderWidth="borderWidth10"
-          borderColor="colorBorder"
         >
           <Heading as="h1" variant="heading10">
             Message Results
@@ -105,7 +107,7 @@ export const IndexPage = (): JSX.Element => {
                   <Text as='p'>Examples:</Text>
                   <UnorderedList>
                     {cluster.examples.map((example: string, j:number) => {
-                      return <ListItem key={j}>Summary: {example}</ListItem>
+                      return <ListItem key={j}>{example}</ListItem>
                     })}
                   </UnorderedList>
                 </Card>

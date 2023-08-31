@@ -1,6 +1,6 @@
 
 import os
-from flask import Flask, make_response, render_template, jsonify
+from flask import Flask, make_response, render_template, jsonify, request
 from get_messages import run
 
 template_dir = os.path.abspath('./message-intelligence/build/')
@@ -20,9 +20,10 @@ def _build_cors_preflight_response():
 def index():
   return render_template('index.html')
 
-@app.route("/cluster")
-def cluster():
-    result = run()
+@app.route("/cluster/<accountSid>/<authToken>")
+def cluster(accountSid, authToken):
+    
+    result = run(accountSid, authToken)
 
     response = jsonify(result)
     # response.headers.add("Access-Control-Allow-Origin", "*")
