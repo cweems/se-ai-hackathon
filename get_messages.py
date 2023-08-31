@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 import openai
-import csv
 
 import numpy as np
 import pandas as pd
@@ -28,46 +27,48 @@ def generate_embedding(text):
 
 def run(account_sid, auth_token):
   message_count = 0
+  body = []
+  direction = []
+  embeddings = []
+  message_dict = {}
   if account_sid != "AC123":
     client = Client(account_sid, auth_token)
     
     message_history = client.messages.list()
-    output_csv_path = './message_history.csv'
 
-    with open(output_csv_path, 'w', newline='') as output_csv:
-      # Write header row
-      csv_writer = csv.writer(output_csv)
-      csv_writer.writerow(['sid','body','direction','embedding']);
+    for message in message_history:
+        print(message.body)
+        message_count += 1
+        if not message.body in embedding_cache:
+          embedding = generate_embedding(message.body);
+          embedding_cache[message.body] = embedding
+        else:
+          embedding = embedding_cache[message.body]
+        
+        body.append(message.body)
+        direction.append(message.direction)
+        embeddings.append([embedding])
 
-      for message in message_history:
-          print(message.body)
-          message_count += 1
-          if not message.body in embedding_cache:
-            embedding = generate_embedding(message.body);
-            embedding_cache[message.body] = embedding
-          else:
-            embedding = embedding_cache[message.body]
-          
-
-          csv_writer.writerow([message.sid, message.body, message.direction] + [embedding]) 
-
-      print('All messages downloaded and created with embeddings');
+    print('All messages downloaded and created with embeddings');
   else:
     message_count = 245
 
-  clustered_results = cluster(message_count, account_sid, auth_token);
+  message_dict['body'] = body
+  message_dict['direction'] = direction
+  message_dict['embedding'] = embeddings
+  clustered_results = cluster(message_count, account_sid, message_dict);
   return clustered_results
 
-def cluster(message_count, account_sid, auth_token):
+def cluster(message_count, account_sid, message_dict):
   # load data
   if account_sid != "AC123":
     datafile_path = "./message_history.csv"
+    df = pd.DataFrame.from_dict(message_dict)
   else:
     datafile_path = "./sample_messages_with_embeddings.csv"
-
-  df = pd.read_csv(datafile_path)
-  df["embedding"] = df.embedding.apply(literal_eval).apply(np.array)  # convert string to numpy array
-
+    df = pd.read_csv(datafile_path)
+  
+  df["embedding"] = df.embedding.apply(np.array)  # convert string to numpy array
   matrix = np.vstack(df.embedding.values)
   matrix.shape
 
@@ -117,4 +118,5 @@ def cluster(message_count, account_sid, auth_token):
 
   response['clusters'] = result
   response['message_count'] = message_count
+
   return response
