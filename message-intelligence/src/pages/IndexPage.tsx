@@ -77,7 +77,7 @@ export const IndexPage = (): JSX.Element => {
             Account Information
           </Heading>
           <Paragraph>
-            Quickly understand messaging use-cases in your Twilio account.
+            Quickly understand messaging use cases in your Twilio account.
           </Paragraph>
           <Box
             marginTop="space60"
@@ -112,7 +112,7 @@ export const IndexPage = (): JSX.Element => {
           margin="space100"
         >
           <Heading as="h1" variant="heading10">
-            Twilio Messsaging Intelligence ✨
+            Twilio Messaging Intelligence ✨
           </Heading>
           <Heading as="h2" variant="heading30">{messageCount} messages analyzed for use cases.</Heading>
 

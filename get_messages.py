@@ -28,36 +28,43 @@ def generate_embedding(text):
 
 def run(account_sid, auth_token):
   message_count = 0
-  client = Client(account_sid, auth_token)
-  
-  message_history = client.messages.list()
-  output_csv_path = './message_history.csv'
+  if account_sid != "AC123":
+    client = Client(account_sid, auth_token)
+    
+    message_history = client.messages.list()
+    output_csv_path = './message_history.csv'
 
-  with open(output_csv_path, 'w', newline='') as output_csv:
-    # Write header row
-    csv_writer = csv.writer(output_csv)
-    csv_writer.writerow(['sid','body','direction','embedding']);
+    with open(output_csv_path, 'w', newline='') as output_csv:
+      # Write header row
+      csv_writer = csv.writer(output_csv)
+      csv_writer.writerow(['sid','body','direction','embedding']);
 
-    for message in message_history:
-        print(message.body)
-        message_count += 1
-        if not message.body in embedding_cache:
-          embedding = generate_embedding(message.body);
-          embedding_cache[message.body] = embedding
-        else:
-          embedding = embedding_cache[message.body]
-        
+      for message in message_history:
+          print(message.body)
+          message_count += 1
+          if not message.body in embedding_cache:
+            embedding = generate_embedding(message.body);
+            embedding_cache[message.body] = embedding
+          else:
+            embedding = embedding_cache[message.body]
+          
 
-        csv_writer.writerow([message.sid, message.body, message.direction] + [embedding]) 
+          csv_writer.writerow([message.sid, message.body, message.direction] + [embedding]) 
 
-    print('All messages downloaded and created with embeddings');
+      print('All messages downloaded and created with embeddings');
+  else:
+    message_count = 245
 
-  clustered_results = cluster(message_count);
+  clustered_results = cluster(message_count, account_sid, auth_token);
   return clustered_results
 
-def cluster(message_count):
+def cluster(message_count, account_sid, auth_token):
   # load data
-  datafile_path = "./message_history.csv"
+  if account_sid != "AC123":
+    datafile_path = "./message_history.csv"
+  else:
+    datafile_path = "./sample_messages_with_embeddings.csv"
+
   df = pd.read_csv(datafile_path)
   df["embedding"] = df.embedding.apply(literal_eval).apply(np.array)  # convert string to numpy array
 
