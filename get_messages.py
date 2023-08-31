@@ -16,6 +16,7 @@ load_dotenv()
 # TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 openai.api_key = os.environ.get('OPENAI_API_KEY')
 
+embedding_cache = {}
 
 def generate_embedding(text):
     response = openai.Embedding.create(
@@ -26,8 +27,7 @@ def generate_embedding(text):
 
 
 def run(account_sid, auth_token):
-  print(account_sid, auth_token)
-
+  message_count = 0
   client = Client(account_sid, auth_token)
   
   message_history = client.messages.list()
@@ -39,18 +39,23 @@ def run(account_sid, auth_token):
     csv_writer.writerow(['sid','body','direction','embedding']);
 
     for message in message_history:
-        if message.body != "":
-          print(message.body)
+        print(message.body)
+        message_count += 1
+        if not message.body in embedding_cache:
           embedding = generate_embedding(message.body);
+          embedding_cache[message.body] = embedding
+        else:
+          embedding = embedding_cache[message.body]
+        
 
-          csv_writer.writerow([message.sid, message.body, message.direction] + [embedding]) 
+        csv_writer.writerow([message.sid, message.body, message.direction] + [embedding]) 
 
     print('All messages downloaded and created with embeddings');
 
-  clustered_results = cluster();
+  clustered_results = cluster(message_count);
   return clustered_results
 
-def cluster():
+def cluster(message_count):
   # load data
   datafile_path = "./message_history.csv"
   df = pd.read_csv(datafile_path)
@@ -67,6 +72,7 @@ def cluster():
   labels = kmeans.labels_
   df["Cluster"] = labels
 
+  response = {}
   result = []
 
   for i in range(n_clusters):
@@ -77,7 +83,7 @@ def cluster():
           .sample(rev_per_cluster, random_state=42)
           .values
       )
-      response = openai.Completion.create(
+      summary = openai.Completion.create(
           engine="text-davinci-003",
           prompt=f'Briefly, what do these SMS messages have in common? If there is no commonality, respond with "Mixed message types"\n\nCustomer sms:\n"""\n{messages}\n"""\n\nTheme:',
           temperature=0,
@@ -87,7 +93,7 @@ def cluster():
           presence_penalty=0,
       )
 
-      entry['summary'] = response["choices"][0]["text"].replace("\n", "")
+      entry['summary'] = summary["choices"][0]["text"].replace("\n", "")
       examples = []
       sample_cluster_rows = df[df.Cluster == i].sample(rev_per_cluster, random_state=42)
       for j in range(rev_per_cluster):
@@ -100,5 +106,8 @@ def cluster():
       entry['examples'] = examples;
       result.append(entry);
       entry['length'] = len(df[df.Cluster == i]);
-     
-  return result
+      entry['percent'] = len(df[df.Cluster == i]) / message_count
+
+  response['clusters'] = result
+  response['message_count'] = message_count
+  return response

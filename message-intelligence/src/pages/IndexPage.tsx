@@ -6,9 +6,9 @@ import {Anchor} from '@twilio-paste/core/anchor';
 import {Button} from '@twilio-paste/core/button';
 import {Heading} from '@twilio-paste/core/heading';
 import {NewIcon} from '@twilio-paste/icons/esm/NewIcon';
-import {LinkExternalIcon} from '@twilio-paste/icons/esm/LinkExternalIcon'
 import {HeatmapIcon} from '@twilio-paste/icons/esm/HeatmapIcon'
-import { Label, Input, HelpText, Grid, Column, Text, Card, UnorderedList, ListItem } from '@twilio-paste/core';
+import {Spinner} from '@twilio-paste/core/spinner';
+import { Label, Input, HelpText, Grid, Column, Text, Card, UnorderedList, ListItem, Table, THead, TBody, Tr, Td, Th } from '@twilio-paste/core';
 import { Paragraph } from '@twilio-paste/core';
 
 import { useRef, useState } from "react";
@@ -18,15 +18,18 @@ import { useRef, useState } from "react";
 export const IndexPage = (): JSX.Element => {
   const [accountSid, setAccountSid] = useState('');
   const [authToken, setAuthToken] = useState('');
-  const [response, setResponse] = useState([
-    // { examples: ['Example 1', 'Example 2', 'Example 3'], summary: 'Test', length: 12 },
-    // { examples: ['Example 1', 'Example 2', 'Example 3'], summary: 'Test', length: 12 }
-  ]);
+  const [messageCount, setMessageCount] = useState(90);
+  const [clusters, setClusters] = useState([
+      { examples: ['Your Twilio verification code is 1234', 'Your Twitch verification code 4321'], summary: 'Sample OTP use case', length: 17, percent: 0.18888889 },
+      { examples: ['Your app download link is click.autobuy.com/1234', 'Your app download link is click.autobuy.com/4567', 'Your app download link is click.autobuy.com/7890'], summary: 'Sample App download use case', length: 73, percent: 0.8111111 }
+    ]);
+
+  const [loadingState, setLoadingState] = useState(false);
   
   async function callBackend (event: any, accountSid: string, authToken: string) {
     event.preventDefault();
-  
-    console.log(accountSid, authToken);
+    setLoadingState(true);
+
     await fetch(`http://localhost:8000/cluster/${accountSid}/${authToken}`, {
       method: "GET", // *GET, POST, PUT, DELETE, etc.
       mode: "no-cors", // no-cors, *cors, same-origin
@@ -40,15 +43,29 @@ export const IndexPage = (): JSX.Element => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setResponse(data);
+        setLoadingState(false);
+        setClusters(data['clusters']);
+        setMessageCount(data.message_count)
       })
 
     //setResponse(response);
   }
 
+  let loadingSpinner;
+
+  if (loadingState === false) {
+    loadingSpinner = <div></div>
+  } else {
+    loadingSpinner = (
+      <Box margin="space100">
+        <Spinner decorative={false} title="Loading" size="sizeIcon80" />
+      </Box>
+      )
+  }
+
   return (
     <Grid gutter="space30">
-      <Column>
+      <Column span={4}>
         <Box
           margin="space100"
           padding="space60"
@@ -57,7 +74,7 @@ export const IndexPage = (): JSX.Element => {
           borderWidth="borderWidth10"
           borderColor="colorBorder">
           <Heading as="h1" variant="heading10">
-            Twilio Messaging Intelligence ✨
+            Account Information
           </Heading>
           <Paragraph>
             Quickly understand messaging use-cases in your Twilio account.
@@ -85,34 +102,48 @@ export const IndexPage = (): JSX.Element => {
           </Box>
           <Button variant="primary" onClick={(event) => callBackend(event, accountSid, authToken)}>
             <NewIcon decorative />
-            Summarize Messages
+            Analyze Use Cases
           </Button>
         </Box>
       </Column>
 
-      <Column>
+      <Column span={8}>
         <Box
           margin="space100"
-          minHeight={'50vh'}
         >
           <Heading as="h1" variant="heading10">
-            Message Results
-            <HeatmapIcon decorative={false} size="sizeIcon80" title="Description of icon" />
+            Twilio Messsaging Intelligence ✨
           </Heading>
-          {response.map(function(cluster:any, i){
-              return (
-                <Card key={i}>
-                  <Text as='p'>Summary: {cluster.summary}</Text>
-                  <Text as='p'>Count: {cluster.length}</Text>
-                  <Text as='p'>Examples:</Text>
-                  <UnorderedList>
-                    {cluster.examples.map((example: string, j:number) => {
-                      return <ListItem key={j}>{example}</ListItem>
-                    })}
-                  </UnorderedList>
-                </Card>
-              );
-          })}
+          <Heading as="h2" variant="heading30">{messageCount} messages analyzed for use cases.</Heading>
+
+          { loadingSpinner }
+
+          <Table>
+            <THead>
+              <Tr>
+                <Th>Use Case</Th>
+                <Th>Frequency</Th>
+                <Th>Sample Messages</Th>
+              </Tr>
+            </THead>
+            <TBody>
+              {clusters.map(function(cluster:any, i){
+                  return (
+                    <Tr key={i}>
+                      <Th scope='row'>{cluster.summary}</Th>
+                      <Td>{Math.round(cluster.percent * 100)}% ({cluster.length})</Td>
+                      <Td>Examples:
+                      <UnorderedList>
+                        {cluster.examples.map((example: string, j:number) => {
+                          return <ListItem key={j}>{example}</ListItem>
+                        })}
+                      </UnorderedList>
+                      </Td>
+                    </Tr>
+                  );
+              })}
+            </TBody>
+          </Table>
         </Box>
       </Column>
     </Grid>
