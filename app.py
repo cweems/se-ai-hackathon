@@ -24,10 +24,12 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
+# Display demo UI
 @app.route("/")
 def index():
   return render_template('index.html')
 
+# Handle 'Analyze Messages' request from front-end
 @app.route("/cluster/<accountSid>/<authToken>")
 @ValidateParameters()
 def cluster(
@@ -35,6 +37,7 @@ def cluster(
     authToken: str = Route()
   ):
     try:
+      # 'run' kicks off the process to fetch and cluster messages
       result = run(accountSid, authToken)
       response = jsonify(result)
       return response
