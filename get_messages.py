@@ -37,7 +37,7 @@ def kMeansRes(scaled_data, k, alpha_k=0.06):
     
     inertia_o = np.square((scaled_data - scaled_data.mean(axis=0))).sum()
     # fit k-means
-    kmeans = KMeans(n_clusters=k, random_state=0).fit(scaled_data)
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init=10).fit(scaled_data)
     scaled_inertia = kmeans.inertia_ / inertia_o + alpha_k * k
     return scaled_inertia
 

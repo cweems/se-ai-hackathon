@@ -164,27 +164,27 @@ site
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-message-intelligence/node_modules
-message-intelligence/.pnp
-message-intelligence/**/.pnp.js
+ui/node_modules
+ui/.pnp
+ui/**/.pnp.js
 
 # testing
-message-intelligence/coverage
-message-intelligence/**/.eslintcache
+ui/coverage
+ui/**/.eslintcache
 
 # production
-# message-intelligence/build
+# ui/build
 
 # misc
-message-intelligence/**/.DS_Store
-message-intelligence/**/.env.local
-message-intelligence/**/.env.development.local
-message-intelligence/**/.env.test.local
-message-intelligence/**/.env.production.local
+ui/**/.DS_Store
+ui/**/.env.local
+ui/**/.env.development.local
+ui/**/.env.test.local
+ui/**/.env.production.local
 
-message-intelligence/**/npm-debug.log*
-message-intelligence/**/yarn-debug.log*
-message-intelligence/**/yarn-error.log*
+ui/**/npm-debug.log*
+ui/**/yarn-debug.log*
+ui/**/yarn-error.log*
 
-# flyctl launch added from message-intelligence/node_modules/tailwindcss/stubs/.gitignore
-!message-intelligence/node_modules/tailwindcss/stubs/**/*
+# flyctl launch added from ui/node_modules/tailwindcss/stubs/.gitignore
+!ui/node_modules/tailwindcss/stubs/**/*

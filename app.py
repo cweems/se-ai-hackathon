@@ -5,8 +5,8 @@ from flask_parameter_validation import ValidateParameters, Route, Json, Query
 from werkzeug.exceptions import HTTPException
 from get_messages import run
 
-template_dir = os.path.abspath('./message-intelligence/build/')
-static_dir = os.path.abspath('./message-intelligence/build/static')
+template_dir = os.path.abspath('./ui/build/')
+static_dir = os.path.abspath('./ui/build/static')
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
